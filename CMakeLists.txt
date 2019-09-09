@@ -18,9 +18,9 @@ add_subdirectory("test")
 add_subdirectory("app")
 # subdirs(app)
 
-find_package(Doxygen
-             REQUIRED dot
-             OPTIONAL_COMPONENTS mscgen dia)
+# find_package(Doxygen
+#              REQUIRED dot
+#              OPTIONAL_COMPONENTS mscgen dia)
 
 
 # set(DOXYGEN_GENERATE_HTML YES)

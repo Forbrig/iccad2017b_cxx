@@ -13,6 +13,15 @@ target_link_libraries(TestParse
   ${Boost_SYSTEM_LIBRARY}
   )
 
+add_executable(RTree test_rtree.cxx)
+target_link_libraries(RTree
+  Model
+  Parser
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  )
+
+
 add_executable(TestMST test_mst.cxx)
 target_link_libraries(TestMST
   Model
