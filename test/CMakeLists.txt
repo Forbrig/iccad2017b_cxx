@@ -17,6 +17,7 @@ add_executable(RTree test_rtree.cxx)
 target_link_libraries(RTree
   Model
   Parser
+  rapidcheck
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   )
