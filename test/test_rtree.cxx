@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <rapidcheck.h>
+#include "generators.hpp"
 
 #include <RTree.h>
 
@@ -19,6 +20,13 @@ bool MySearchCallback(int id) {
     // cout << "Hit data rect " << id << "\n";
     return true; // keep going
 }
+
+// return the shapes found
+// bool shapesFound(int* min, int* max, int id) {
+//   cout << "Hit data rect " << id << "\n";
+//   cout << "In Rect [" << min[0] << "," << min[1] << "], [" << max[0] << "," << max[1] << "]\n";
+//   return true; // keep going
+// }
 
 // int main(int argc, char ** argv) {
 //     Input i;
@@ -75,27 +83,75 @@ bool MySearchCallback(int id) {
 // }
 
 
-void test_query(std::vector<int[3]> &low, std::vector<int[3]> &high) {
+void test_inserted_shapes(vector<Shape> shapes) {
+    std::vector<int[3]> low, high;
     typedef RTree<int, int, 3, float> MyTree;
     MyTree tree;
 
     // insert on tree
-    for (size_t i = 0; i < low.size(); i++) {
-        tree.Insert(low[i], high[i], i);
+    for (int j = 0; j < shapes.size(); j++) {
+        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
+        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
+
+        tree.Insert(low, high, j);
     }
 
     // find the shapes
+    for (int j = 0; j < shapes.size(); j++) {
+        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
+        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
 
-    for (size_t i = 0; i < low.size(); i++) {
-        int found = tree.Search(low[i], high[i], MySearchCallback);
+        int found = tree.Search(low, high, MySearchCallback);
         RC_ASSERT(found > 0);
     }
 }
 
+void test_rtree_collect(const Shape s, const vector<Shape> shapes) {
+
+    if (shapes.size() == 0) {
+        RC_DISCARD("discarding empty testcase");
+    }
+                // RC_ASSERT(false);
+
+    // std::vector<int[3]> low, high;
+    typedef RTree<int, int, 3, float> MyTree;
+    MyTree tree;
+
+    // insert on tree
+    for (int j = 0; j < shapes.size(); j++) {
+        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
+        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
+
+        tree.Insert(low, high, j);
+
+    
+        // std::function<bool(int)> test = [&shapes](int id){ return true; };
+        
+    }
+
+    int low_s[] = {s.a.x, s.a.y, s.a.z};
+    int high_s[] = {s.b.x, s.b.y, s.b.z};
+    int found = tree.Search(low_s, high_s, 
+            [&shapes, &s](int id){ 
+
+                RC_ASSERT(false);
+                // cout << shapes[id] <<
+                return true; 
+            });
+    
+
+    // RC_ASSERT(found > 0);
+
+
+    // int found = tree.Search(low, high, shapesFound);
+
+}
+
 int main(int argc, char ** argv) {
-    rc::check("Check that added shapes can be queried", [](std::vector<int[3]> &low, std::vector<int[3]> &high) {
-        test_query(low, high);
-    });
+    rc::check("Check that added shapes can be queried", test_inserted_shapes);
+
+    rc::check("Check that collected shapes are colliding with the query", test_rtree_collect);
+
 
     return 0;
 }

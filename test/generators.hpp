@@ -31,9 +31,10 @@ namespace rc {
     static Gen<Shape> arbitrary() {
       return gen::map(gen::container<array<array<int, 3>, 2>>(genPT),
         [](array<array<int, 3>, 2> pts) {
+          int z = pts[0][2] % 8;
           return Shape(
-            PT(min(pts[0][0], pts[1][0]), min(pts[0][1], pts[1][1]), 0 ), // min(pts[0][2], pts[1][2])),
-            PT(max(pts[0][0]+1, pts[1][0]), max(pts[0][1]+1, pts[1][1]), 0 ) //max(pts[0][2], pts[1][2]))
+            PT(min(pts[0][0], pts[1][0]), min(pts[0][1], pts[1][1]), z ), // min(pts[0][2], pts[1][2])),
+            PT(max(pts[0][0]+1, pts[1][0]), max(pts[0][1]+1, pts[1][1]), z ) //max(pts[0][2], pts[1][2]))
           );
         });
     }
