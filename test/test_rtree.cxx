@@ -111,7 +111,6 @@ void test_rtree_collect(const Shape s, const vector<Shape> shapes) {
     if (shapes.size() == 0) {
         RC_DISCARD("discarding empty testcase");
     }
-                // RC_ASSERT(false);
 
     // std::vector<int[3]> low, high;
     typedef RTree<int, int, 3, float> MyTree;
@@ -123,35 +122,30 @@ void test_rtree_collect(const Shape s, const vector<Shape> shapes) {
         int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
 
         tree.Insert(low, high, j);
-
-    
-        // std::function<bool(int)> test = [&shapes](int id){ return true; };
-        
     }
 
     int low_s[] = {s.a.x, s.a.y, s.a.z};
     int high_s[] = {s.b.x, s.b.y, s.b.z};
     int found = tree.Search(low_s, high_s, 
-            [&shapes, &s](int id){ 
-
-                RC_ASSERT(false);
-                // cout << shapes[id] <<
+            [&shapes, &s](int id) { 
+                RC_ASSERT(collides(shapes[id], s));
                 return true; 
             });
-    
 
-    // RC_ASSERT(found > 0);
-
-
-    // int found = tree.Search(low, high, shapesFound);
-
+    // cout << "numero de colisões: " << found << "\n";
 }
+
+void test_rtree_collect_neg() {
+
+
+} 
 
 int main(int argc, char ** argv) {
     rc::check("Check that added shapes can be queried", test_inserted_shapes);
 
     rc::check("Check that collected shapes are colliding with the query", test_rtree_collect);
 
+    rc::check("Check that not collected shapes collide with the query", test_rtree_collect_neg);
 
     return 0;
 }
