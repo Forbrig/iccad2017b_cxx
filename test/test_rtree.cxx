@@ -135,9 +135,35 @@ void test_rtree_collect(const Shape s, const vector<Shape> shapes) {
     // cout << "numero de colisões: " << found << "\n";
 }
 
-void test_rtree_collect_neg() {
+void test_rtree_collect_neg(const Shape s, const vector<Shape> shapes) {
+    if (shapes.size() == 0) {
+        RC_DISCARD("discarding empty testcase");
+    }
 
+    // std::vector<int[3]> low, high;
+    typedef RTree<int, int, 3, float> MyTree;
+    MyTree tree;
 
+    // insert on tree
+    for (int j = 0; j < shapes.size(); j++) {
+        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
+        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
+
+        tree.Insert(low, high, j);
+    }
+
+    int low_s[] = {s.a.x, s.a.y, s.a.z};
+    int high_s[] = {s.b.x, s.b.y, s.b.z};
+    int found = tree.Search(low_s, high_s, 
+            [](int id) { 
+                return true; 
+            });
+
+    if (found == 0) {
+       for (int i = 0; i < shapes.size(); i++) {
+           RC_ASSERT(!collides(shapes[i], s));
+       }
+    }
 } 
 
 int main(int argc, char ** argv) {
