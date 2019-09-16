@@ -152,31 +152,19 @@ void test_rtree_collect_neg(const Shape s, const vector<Shape> shapes) {
         tree.Insert(low, high, j);
     }
 
-    int found_array[1234567]; //list that will hold the found ids
-    int f = 0; // id of the last found shape
+    vector<bool> found(shapes.size(), false);
     int low_s[] = {s.a.x, s.a.y, s.a.z};
     int high_s[] = {s.b.x, s.b.y, s.b.z};
-    int found = tree.Search(low_s, high_s, 
-            [&found_array, &f](int id) {
-                found_array[f] = id;
-                f++;
+    tree.Search(low_s, high_s, 
+            [&found](int id) {
+                found[id] = true;
                 return true; 
             });
 
-    int flag = 0;
-    if (f > 0) { // if there is ids inside found_array
-       for (int i = 0; i < shapes.size(); i++) {
-            flag = 0;
-            for (int k = 0; k < f; k++) {
-                if (found_array[k] == i) {
-                    flag = 1;            
-                    break;
-                }
-            }
-            if (flag = 0) {
-                RC_ASSERT(!collides(shapes[i], s));            
-            }
-       }
+    for (int i = 0; i < shapes.size(); i++) {
+        if (found[i] == false) {
+            RC_ASSERT(!collides(shapes[i], s));            
+        }
     }
 } 
 
