@@ -2,13 +2,10 @@
 #include <router.hpp>
 #include <iostream>
 #include <vector>
-// #include <random>
 #include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <sstream>
-#include <rapidcheck.h>
-#include "generators.hpp"
 
 #include <RTree.h>
 
@@ -19,187 +16,6 @@ using namespace iccad;
 bool MySearchCallback(int id) {
     // cout << "Hit data rect " << id << "\n";
     return true; // keep going
-}
-
-bool KeepGoingCallback(int id) {
-    return true; // keep going
-}
-
-void test_inserted_shapes(vector<Shape> shapes) {
-    std::vector<int[3]> low, high;
-    typedef RTree<int, int, 3, float> MyTree;
-    MyTree tree;
-
-    // insert on tree
-    for (int j = 0; j < shapes.size(); j++) {
-        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
-        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
-
-        tree.Insert(low, high, j);
-    }
-
-    // find the shapes
-    for (int j = 0; j < shapes.size(); j++) {
-        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
-        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
-
-        int found = tree.Search(low, high, KeepGoingCallback);
-        RC_ASSERT(found > 0);
-    }
-}
-
-void test_rtree_collect(const Shape s, const vector<Shape> shapes) {
-
-    if (shapes.size() == 0) {
-        RC_DISCARD("discarding empty testcase");
-    }
-
-    typedef RTree<int, int, 3, float> MyTree;
-    MyTree tree;
-
-    // insert on tree
-    for (int j = 0; j < shapes.size(); j++) {
-        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
-        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
-
-        tree.Insert(low, high, j);
-    }
-
-    int low_s[] = {s.a.x, s.a.y, s.a.z};
-    int high_s[] = {s.b.x, s.b.y, s.b.z};
-    int found = tree.Search(low_s, high_s, 
-            [&shapes, &s](int id) { 
-                RC_ASSERT(collides(shapes[id], s));
-                return true; 
-            });
-}
-
-void test_rtree_collect_neg(const Shape s, const vector<Shape> shapes) {
-    if (shapes.size() == 0) {
-        RC_DISCARD("discarding empty testcase");
-    }
-
-    // std::vector<int[3]> low, high;
-    typedef RTree<int, int, 3, float> MyTree;
-    MyTree tree;
-
-    // insert on tree
-    for (int j = 0; j < shapes.size(); j++) {
-        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
-        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
-
-        tree.Insert(low, high, j);
-    }
-
-    vector<bool> found(shapes.size(), false);
-    int low_s[] = {s.a.x, s.a.y, s.a.z};
-    int high_s[] = {s.b.x, s.b.y, s.b.z};
-    tree.Search(low_s, high_s, 
-            [&found](int id) {
-                found[id] = true;
-                return true; 
-            });
-
-    for (int i = 0; i < shapes.size(); i++) {
-        if (found[i] == false) {
-            RC_ASSERT(!collides(shapes[i], s));            
-        }
-    }
-}
-
-void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsigned int n) {
-    if (shapes.size() == 0 || n == 0) {
-        RC_DISCARD("discarding empty testcase");
-    }
-
-    // std::vector<int[3]> low, high;
-    typedef RTree<int, int, 3, float> MyTree;
-    MyTree tree;
-
-    // insert on tree
-    for (int j = 0; j < shapes.size(); j++) {
-        int low[] = {shapes[j].a.x, shapes[j].a.y, shapes[j].a.z};
-        int high[] = {shapes[j].b.x, shapes[j].b.y, shapes[j].b.z};
-
-        tree.Insert(low, high, j);
-    }
-
-    // search nearests
-    int ns = 0;
-
-    int x1 = s.a.x;
-    int x2 = s.b.x;
-    int y1 = s.a.y;
-    int y2 = s.b.y;
-    vector<bool> found(shapes.size(), false); // salva os shapes que colidem
-
-    for (int i = 1; ns < n; i = i * 2) { // para quando encontrar a quantidade de retângulos n
-        // testa ele mesmo
-        cout << i << "\n";
-
-        {
-            // em cima
-            int low_s[] = {x1 - i, y1, s.a.z};
-            int high_s[] = {x2 + i, y1 - i, s.b.z};
-            tree.Search(low_s, high_s,
-                        [&found, &ns](int id) {
-                            if (found[id] == false) {
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
-
-        {
-            // em baixo
-            int low_s[] = {x1 - i, y2, s.a.z};
-            int high_s[] = {x2 + i, y2 + i, s.b.z};
-            tree.Search(low_s, high_s, 
-                        [&found, &ns](int id) {
-                            if (found[id] == false) {
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
-        
-        {
-            // esquerda
-            int low_s[] = {x1 - i, y1, s.a.z};
-            int high_s[] = {x1, y2, s.b.z};
-            tree.Search(low_s, high_s,
-                        [&found, &ns](int id) {
-                            if (found[id] == false) {
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
-        
-        {
-            // direita
-            int low_s[] = {x2, y1, s.a.z};
-            int high_s[] = {x2 + i, y2, s.b.z};
-            tree.Search(low_s, high_s, 
-                        [&found, &ns](int id) {
-                            if (found[id] == false) {
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
-        
-        x1 = x1 - i;
-        x2 = x2 + i;
-        y1 = y1 - i;
-        y2 = y2 + i;
-    }
-
-    cout << "n " << ns << "\n";
 }
 
 void insertion_test(const vector<Shape> s) {
@@ -296,14 +112,6 @@ void search_neighbors_test(const Shape s, const vector<Shape> shapes, const int 
 }
 
 int main(int argc, char ** argv) {
-
-    // rapidckeck tests
-    // rc::check("Check that added shapes can be queried", test_inserted_shapes);
-    // rc::check("Check that collected shapes are colliding with the query", test_rtree_collect);
-    // rc::check("Check that not collected shapes collide with the query", test_rtree_collect_neg);
-    rc::check("Check that nearests shapes collide with area", test_rtree_closest_n_shapes);
-
-    
 
     // Input i;
     // parser::parse_file(i, argv[1]);
