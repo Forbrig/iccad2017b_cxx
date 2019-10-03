@@ -16,8 +16,12 @@ using namespace std;
 using namespace std::chrono;
 using namespace iccad;
 
-
-bool KeepGoingCallback(int id, int found_shapes) {
+// id do shape encotrado, vetor dos shapes, vetor dos encontrados (bool), contador
+bool search_n_callback(int id, vector<bool> &found, int &n) {
+    if (found[id] == false) {
+        found[id] = true;
+        n++;
+    }
     return true;
 }
 
@@ -103,134 +107,15 @@ void test_rtree_collect_neg(const Shape s, const vector<Shape> shapes) {
     }
 }
 
-// void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsigned int n) {
-//     if (shapes.size() == 0 || n == 0) {
-//         RC_DISCARD("discarding empty testcase");
-//     }
+void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsigned int p) {
+    
+    if (shapes.size() == 0) {
+        RC_DISCARD("discarding empty testcase");
+    }
 
-//     // std::vector<int[3]> low, high;
-//     typedef RTree<int, int, 3, float> MyTree;
-//     MyTree tree;
+    unsigned n = p % shapes.size();
 
-//     // insert on tree
-//     for (int j = 0; j < shapes.size(); j++) {
-//         int low[] = {shapes[j].a.x, shapes[j].a.y, 0};
-//         int high[] = {shapes[j].b.x, shapes[j].b.y, 0};
-
-//         tree.Insert(low, high, j);
-//     }
-
-//     // search nearests
-//     ns = 0;
-
-//     int x1 = s.a.x;
-//     int x2 = s.b.x;
-//     int y1 = s.a.y;
-//     int y2 = s.b.y;
-//     vector<bool> found(shapes.size(), false); // salva os shapes que colidem
-
-//     for (int i = 1; ns < n && i < 123456789; i = i * 2) { // para quando encontrar a quantidade de retângulos n
-//         // testa ele mesmo
-
-//         // cout << i << "\n";
-
-//         {
-//             // em cima
-//             int low_s[] = {x1 - i, y1 - i, 0};
-//             int high_s[] = {x2 + i, y1, 0};
-//             tree.Search(low_s, high_s,
-//                         [&shapes, &found, &low_s, &high_s](int id) {
-//                             if (found[id] == false) {
-//                                 Shape aux;
-//                                 aux.a.x = low_s[0];
-//                                 aux.b.x = high_s[0];
-//                                 aux.a.y = low_s[1];
-//                                 aux.b.y = high_s[1];
-//                                 aux.a.z = shapes[id].a.z;
-//                                 aux.b.z = shapes[id].b.z;
-//                                 RC_ASSERT(collides(shapes[id], aux));
-//                                 ns++;
-//                             }
-//                             found[id] = true;
-//                             return true; 
-//                         });
-//         }
-
-//         {
-//             // em baixo
-//             int low_s[] = {x1 - i, y2, 0};
-//             int high_s[] = {x2 + i, y2 + i, 0};
-//             tree.Search(low_s, high_s,
-//                         [&shapes, &found, &low_s, &high_s](int id) {
-//                             if (found[id] == false) {
-//                                 Shape aux;
-//                                 aux.a.x = low_s[0];
-//                                 aux.b.x = high_s[0];
-//                                 aux.a.y = low_s[1];
-//                                 aux.b.y = high_s[1];
-//                                 aux.a.z = shapes[id].a.z;
-//                                 aux.b.z = shapes[id].b.z;
-//                                 RC_ASSERT(collides(shapes[id], aux));
-//                                 ns++;
-//                             }
-//                             found[id] = true;
-//                             return true; 
-//                         });
-//         }
-        
-//         {
-//             // esquerda
-//             int low_s[] = {x1 - i, y1, 0};
-//             int high_s[] = {x1, y2, 0};
-//             tree.Search(low_s, high_s,
-//                         [&shapes, &found, &low_s, &high_s](int id) {
-//                             if (found[id] == false) {
-//                                 Shape aux;
-//                                 aux.a.x = low_s[0];
-//                                 aux.b.x = high_s[0];
-//                                 aux.a.y = low_s[1];
-//                                 aux.b.y = high_s[1];
-//                                 aux.a.z = shapes[id].a.z;
-//                                 aux.b.z = shapes[id].b.z;
-//                                 RC_ASSERT(collides(shapes[id], aux));
-//                                 ns++;
-//                             }
-//                             found[id] = true;
-//                             return true; 
-//                         });
-//         }
-        
-//         {
-//             // direita
-//             int low_s[] = {x2, y1, 0};
-//             int high_s[] = {x2 + i, y2, 0};
-//             tree.Search(low_s, high_s,
-//                         [&shapes, &found, &low_s, &high_s](int id) {
-//                             if (found[id] == false) {
-//                                 Shape aux;
-//                                 aux.a.x = low_s[0];
-//                                 aux.b.x = high_s[0];
-//                                 aux.a.y = low_s[1];
-//                                 aux.b.y = high_s[1];
-//                                 aux.a.z = shapes[id].a.z;
-//                                 aux.b.z = shapes[id].b.z;
-//                                 RC_ASSERT(collides(shapes[id], aux));
-//                                 ns++;
-//                             }
-//                             found[id] = true;
-//                             return true; 
-//                         });
-//         }
-        
-//         x1 = x1 - i;
-//         x2 = x2 + i;
-//         y1 = y1 - i;
-//         y2 = y2 + i;
-//     }
-// }
-
-void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsigned int n) {
-    if (shapes.size() == 0 || n == 0) {
+    if (n == 0) {
         RC_DISCARD("discarding empty testcase");
     }
 
@@ -247,89 +132,85 @@ void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsi
 
     // search nearests
     int ns = 0;
+    Shape aux;
+
+    int x1 = s.a.x;
+    int y1 = s.a.y;
+    int z1 = s.a.z;
+    int x2 = s.b.x;
+    int y2 = s.b.y;
+    int z2 = s.b.z;
 
     vector<bool> found(shapes.size(), false); // salva os shapes que colidem
 
     for (int i = 1; ns < n && i < 123456789; i = i * 2) { // para quando encontrar a quantidade de retângulos n
 
-        {
-            shape aux;
-            // em cima
-            int low_s[] = {x1 - i, y1 - i, 0};
-            int high_s[] = {x2 + i, y1, 0};
+        // direita
+        aux.a.x = x2;
+        aux.a.y = y1 - i;
+        aux.a.z = z1 - i;
+        aux.b.x = x2 + i;
+        aux.b.y = y2 + i;
+        aux.b.z = z2 + i;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
 
-            rtree_search_shape();
-
-        }
-
-        {
-            // em baixo
-            int low_s[] = {x1 - i, y2, 0};
-            int high_s[] = {x2 + i, y2 + i, 0};
-            tree.Search(low_s, high_s,
-                        [&shapes, &found, &low_s, &high_s](int id) {
-                            if (found[id] == false) {
-                                Shape aux;
-                                aux.a.x = low_s[0];
-                                aux.b.x = high_s[0];
-                                aux.a.y = low_s[1];
-                                aux.b.y = high_s[1];
-                                aux.a.z = shapes[id].a.z;
-                                aux.b.z = shapes[id].b.z;
-                                RC_ASSERT(collides(shapes[id], aux));
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
+        // esqueda
+        aux.a.x = x1 - i;
+        aux.a.y = y1 - i;
+        aux.a.z = z1 - i;
+        aux.b.x = x1;
+        aux.b.y = y2 + i;
+        aux.b.z = z2 + i;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
         
-        {
-            // esquerda
-            int low_s[] = {x1 - i, y1, 0};
-            int high_s[] = {x1, y2, 0};
-            tree.Search(low_s, high_s,
-                        [&shapes, &found, &low_s, &high_s](int id) {
-                            if (found[id] == false) {
-                                Shape aux;
-                                aux.a.x = low_s[0];
-                                aux.b.x = high_s[0];
-                                aux.a.y = low_s[1];
-                                aux.b.y = high_s[1];
-                                aux.a.z = shapes[id].a.z;
-                                aux.b.z = shapes[id].b.z;
-                                RC_ASSERT(collides(shapes[id], aux));
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
+        // frente
+        aux.a.x = x1;
+        aux.a.y = y1 - i;
+        aux.a.z = z2;
+        aux.b.x = x2;
+        aux.b.y = y2 + i;
+        aux.b.z = z2 + i;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
         
-        {
-            // direita
-            int low_s[] = {x2, y1, 0};
-            int high_s[] = {x2 + i, y2, 0};
-            tree.Search(low_s, high_s,
-                        [&shapes, &found, &low_s, &high_s](int id) {
-                            if (found[id] == false) {
-                                Shape aux;
-                                aux.a.x = low_s[0];
-                                aux.b.x = high_s[0];
-                                aux.a.y = low_s[1];
-                                aux.b.y = high_s[1];
-                                aux.a.z = shapes[id].a.z;
-                                aux.b.z = shapes[id].b.z;
-                                RC_ASSERT(collides(shapes[id], aux));
-                                ns++;
-                            }
-                            found[id] = true;
-                            return true; 
-                        });
-        }
+        // atras
+        aux.a.x = x1;
+        aux.a.y = y1 - i;
+        aux.a.z = z1 - i;
+        aux.b.x = x2;
+        aux.b.y = y2 + i;
+        aux.b.z = z1;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
+
+        // em cima
+        aux.a.x = x1;
+        aux.a.y = y1 - i;
+        aux.a.z = z1;
+        aux.b.x = x2;
+        aux.b.y = y1;
+        aux.b.z = z2;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
+
+        // em baixo
+        aux.a.x = x1;
+        aux.a.y = y2;
+        aux.a.z = z1;
+        aux.b.x = x2;
+        aux.b.y = y2 + i;
+        aux.b.z = z2;
+        rtree_search_shape(tree, aux, [&found, &ns](int id)->bool { return search_n_callback(id, found, ns); } );
         
         s.expand(i);
     }
+
+    // distancia do s e cada um dos found bool
+    // pegar a maior distanicia d
+    // ver se a distancia dos não encontrados é menor que n
+    // for {
+    //     distance(a, b);
+    // }
+    cout << "n: " << n << " ns: " << ns << "\n";
+    // RC_ASSERT(collides(shapes[id], aux));
+
 }
 
 

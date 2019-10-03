@@ -22,10 +22,5 @@ bool rtree_search_shape(const RTree<int, int, 3, float> &tree, const Shape &sp, 
     int high_s[3];
     to_array(sp.b, high_s);
             
-    return tree.Search(low_s, high_s, [f](int id) {
-            if (true) {
-                f(id);
-            }
-        }
-    );
+    return tree.Search(low_s, high_s, f);
 }
