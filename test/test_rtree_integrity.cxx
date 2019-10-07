@@ -101,7 +101,6 @@ vector<Shape> directions(const Shape &ref, int i) {
     aux.b.z = z2;
     result.push_back(aux);
 
-
     return result;
 }
 
@@ -230,44 +229,28 @@ void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsi
             rtree_search_shape(tree, direcs[side], [&s, &shapes, &neighboors](int id)->bool { return search_neighboors(id, s, shapes, neighboors); } );
         }
 
+        // https://github.com/splucs/Competitive-Programming/blob/master/Macacário/Graphs/dijkstra.cpp
+
         // inseri todos 
         // agora retiro os que eu sei que estao na distancia i 
         // para cada um que eu sei que esta na distancia ns++
+
+        while (!neighboors.empty()) {
+            int dist = neighboors.begin()->first;
+            if (dist <= i) { // se a distancia for menor que a area procurada entao retira a shape do set
+                neighboors.erase(neighboors.begin());
+                ns++; // contabliza nos shapes encotrados
+            } else { // se for maior para pois o set esta ordenado pela distancia
+                break;
+            }
+        }
         
-        // https://github.com/splucs/Competitive-Programming/blob/master/Macacário/Graphs/dijkstra.cpp
-
-
         s.expand(i);
     }
 
+    // testa se os elementos que sobraram estao realmente mais distantes que i
 
-    // // distancia do s e cada um dos found bool
-    // // pegar a maior distanicia d
-    // // ver se a distancia dos não encontrados é menor que n
-    // int maior_distancia = 0;
-    // int aux_dist;
-    // for (int i = 0; i < found.size(); i++) {
-    //     if (found[i] == true) {
-    //         aux_dist = distance(s, shapes[i]);
-    //         if (aux_dist > maior_distancia) {
-    //             maior_distancia = aux_dist;
-    //         }
-    //     }
-    // }
-
-    // // procura em todos os não encontrados e vê se a distância deles é menor que a maior dos encontrados
-    // for (int i = 0; i < found.size(); i++) {
-    //     if (found[i] == false) {
-    //         aux_dist = distance(s, shapes[i]);
-    //         if (aux_dist <= maior_distancia) {
-    //             cout << aux_dist << " " << maior_distancia << "\n";
-    //         }
-            
-    //         // RC_ASSERT(aux_dist <= maior_distancia);
-    //     }
-    // }
-
-    // cout << "n: " << n << " ns: " << ns << "\n";
+    cout << n << " " << ns << "\n";
 }
 
 int main(int argc, char ** argv) {
