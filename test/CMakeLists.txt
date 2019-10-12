@@ -23,9 +23,9 @@ target_link_libraries(
 	${Boost_SYSTEM_LIBRARY}
 )
 
-add_executable(TestRTreeIntegrity test_rtree_integrity.cxx)
+add_executable(TestRTreeIntegration test_rtree_integration.cxx)
 target_link_libraries(
-	TestRTreeIntegrity
+	TestRTreeIntegration
 	Model
 	Parser
 	rapidcheck
