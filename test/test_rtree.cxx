@@ -82,6 +82,7 @@ void search_neighbors_test(const Shape s, const vector<Shape> shapes, const int 
 
     int i = 0;
     for (i = 1; ns < n && i < 123456; i = i * 2) { // para quando encontrar a quantidade de retângulos n
+        cout << i << "\n";
 
         vector<Shape> direcs = neighbooring_quadrants(z, i);
 
@@ -125,11 +126,32 @@ void search_neighbors_test(const Shape s, const vector<Shape> shapes, const int 
 
     int err = 0;
 
-    cout << i << "\n";
     cout << "Execute({";
-
     print_shape(s, 3);
+    cout << ",";
+    print_shape(s.expand(512), 3);
+    cout << ",";
+    print_shape(s.expand(256), 3);
+    cout << ",";
+    print_shape(s.expand(128), 3);
+    cout << ",";
+    print_shape(s.expand(64), 3);
+    cout << ",";
+    print_shape(s.expand(32), 3);
+    cout << ",";
+    print_shape(s.expand(16), 3);
+    cout << ",";
+    print_shape(s.expand(8), 3);
+    cout << ",";
+    print_shape(s.expand(4), 3);
+    cout << ",";
+    print_shape(s.expand(2), 3);
+    cout << ",";
+    print_shape(s.expand(1), 3);
+    cout << "})\n";
 
+
+    cout << "Execute({";
     // testa se os elementos que sobraram estao realmente mais distantes que i
     for (int k = 0; k < shapes.size(); k++) {
         if ((found[k] == false) && (distance(s, shapes[k]) < i)) {
@@ -195,7 +217,7 @@ int main(int argc, char ** argv) {
     // cout << distance(m, n) << "\n";
 
 
-    search_neighbors_test(shapes[55], shapes, 20);
+    search_neighbors_test(shapes[500], shapes, 20);
     // search_neighbors_test(obstacles[0], obstacles, 100);
 
     // auto t2 = std::chrono::high_resolution_clock::now();
