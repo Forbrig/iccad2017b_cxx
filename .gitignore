@@ -2,3 +2,10 @@ build
 release
 .vscode/*
 trash/*
+test/test/
+
+test/lib/
+
+ext-libs/
+
+test/

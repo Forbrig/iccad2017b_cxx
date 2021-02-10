@@ -228,10 +228,22 @@ void test_rtree_closest_n_shapes(const Shape s, const vector<Shape> shapes, unsi
 
 int main(int argc, char ** argv) {
     // rapidckeck tests
-    // rc::check("Check that added shapes can be queried", test_inserted_shapes);
-    // rc::check("Check that collected shapes are colliding with the query", test_rtree_collect);
-    // rc::check("Check that not collected shapes collide with the query", test_rtree_collect_neg);
-    rc::check("Check that nearests shapes collide with area", test_rtree_closest_n_shapes);
 
+	auto t1 = std::chrono::high_resolution_clock::now();
+    rc::check("Check that added shapes can be queried", test_inserted_shapes);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    cout << "test_inserted_shapes the duration was " << duration_cast<milliseconds>( t2 - t1 ).count() << "\n";
+
+	t1 = std::chrono::high_resolution_clock::now();
+    rc::check("Check that collected shapes are colliding with the query", test_rtree_collect);
+    t2 = std::chrono::high_resolution_clock::now();
+    cout << "test_rtree_collect the duration was " << duration_cast<milliseconds>( t2 - t1 ).count() << "\n";
+
+	t1 = std::chrono::high_resolution_clock::now();
+    rc::check("Check that not collected shapes collide with the query", test_rtree_collect_neg);
+    t2 = std::chrono::high_resolution_clock::now();
+    cout << "test_rtree_collect_neg the duration was " << duration_cast<milliseconds>( t2 - t1 ).count() << "\n";
+
+    // rc::check("Check that nearests shapes collide with area", test_rtree_closest_n_shapes);
     return 0;
 }
